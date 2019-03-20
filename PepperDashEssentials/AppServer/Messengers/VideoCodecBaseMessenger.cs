@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 
 using PepperDash.Essentials.Devices.Common.Codec;
 using PepperDash.Essentials.Devices.Common.VideoCodec;
+using PepperDash.Essentials.Devices.Common.Cameras;
 
 namespace PepperDash.Essentials.AppServer.Messengers
 {
@@ -48,6 +49,8 @@ namespace PepperDash.Essentials.AppServer.Messengers
             {
                 recCodec.CallHistory.RecentCallsListHasChanged += new EventHandler<EventArgs>(CallHistory_RecentCallsListHasChanged);
             }
+
+
 		}
 
         /// <summary>
@@ -200,6 +203,15 @@ namespace PepperDash.Essentials.AppServer.Messengers
             if (recCodec != null)
             {
                 appServerController.AddAction(MessagePath + "/getCallHistory", new Action(GetCallHistory));
+            }
+
+            var cameraCodec = Codec as IHasCameras;
+            if (cameraCodec != null)
+            {
+                var camera = cameraCodec.SelectedCamera as IHasCameraPtzControl;
+
+                appServerController.AddAction(MessagePath + "/cameraUp", new PressAndHoldAction(b => b ? camera.TiltUp : camera.Stop));
+                appServerController.AddAction(MessagePath + "/cameraDown", new PressAndHoldAction(b => b ? camera.TiltDown() : camera.Stop()));
             }
 
 			appServerController.AddAction(MessagePath + "/privacyModeOn", new Action(Codec.PrivacyModeOn));
@@ -365,7 +377,7 @@ namespace PepperDash.Essentials.AppServer.Messengers
 				hasDirectory = Codec is IHasDirectory,
                 hasDirectorySearch = true,
                 hasRecents = Codec is IHasCallHistory,
-                hasCameras = Codec is IHasCameraControl
+                hasCameras = Codec is IHasCameras
 			});
 		}
 	}
