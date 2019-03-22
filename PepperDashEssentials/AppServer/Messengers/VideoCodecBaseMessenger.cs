@@ -210,8 +210,22 @@ namespace PepperDash.Essentials.AppServer.Messengers
             {
                 var camera = cameraCodec.SelectedCamera as IHasCameraPtzControl;
 
-                appServerController.AddAction(MessagePath + "/cameraUp", new PressAndHoldAction(b => b ? camera.TiltUp : camera.Stop));
-                appServerController.AddAction(MessagePath + "/cameraDown", new PressAndHoldAction(b => b ? camera.TiltDown() : camera.Stop()));
+                appServerController.AddAction("/cameraSelect", new Action<string>(s => cameraCodec.SelectCamera(s)));               
+                appServerController.AddAction(MessagePath + "/cameraUp", new PressAndHoldAction(new Action<bool>(b => {if(b)camera.TiltUp(); else camera.TiltStop(); })));
+                appServerController.AddAction(MessagePath + "/cameraDown", new PressAndHoldAction(new Action<bool>(b => { if (b)camera.TiltDown(); else camera.TiltStop(); })));
+                appServerController.AddAction(MessagePath + "/cameraLeft", new PressAndHoldAction(new Action<bool>(b => { if (b)camera.PanLeft(); else camera.PanStop(); })));
+                appServerController.AddAction(MessagePath + "/cameraRight", new PressAndHoldAction(new Action<bool>(b => { if (b)camera.PanRight(); else camera.PanStop(); })));
+                appServerController.AddAction(MessagePath + "/cameraZoomIn", new PressAndHoldAction(new Action<bool>(b => { if (b)camera.ZoomIn(); else camera.ZoomStop(); })));
+                appServerController.AddAction(MessagePath + "/cameraZoomOut", new PressAndHoldAction(new Action<bool>(b => { if (b)camera.ZoomOut(); else camera.ZoomStop(); })));
+
+                var focusCamera = cameraCodec as IHasCameraFocusControl;
+
+                if (focusCamera != null)
+                {
+                    appServerController.AddAction(MessagePath + "/cameraAutoFocus", new Action(focusCamera.TriggerAutoFocus));
+                    appServerController.AddAction(MessagePath + "/cameraFocusNear", new PressAndHoldAction(new Action<bool>(b => { if (b)focusCamera.FocusNear(); else focusCamera.FocusStop(); })));
+                    appServerController.AddAction(MessagePath + "/cameraFocusFar", new PressAndHoldAction(new Action<bool>(b => { if (b)focusCamera.FocusFar(); else focusCamera.FocusStop(); })));
+                }
             }
 
 			appServerController.AddAction(MessagePath + "/privacyModeOn", new Action(Codec.PrivacyModeOn));
