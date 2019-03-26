@@ -357,12 +357,12 @@ namespace PepperDash.Essentials.AppServer.Messengers
 			addAction("/cameraModeManual", BCameraModeManual);
 			addAction("/cameraModeOff", BCameraModeOff);
 
-			asc.AddAction("/cameraSelect", new Action<string>(SelectCamera));
+			asc.AddAction(MessagePath + "/cameraSelect", new Action<string>(SelectCamera));
 
 			// camera presets
 			for(uint i = 0; i < 6; i++) 
 			{
-				addAction("/cameraPreset" + (i + 1), BCameraPresetStart + i);
+				addAction(MessagePath + "/cameraPreset" + (i + 1), BCameraPresetStart + i);
 			}
 
 			asc.AddAction(MessagePath + "/isReady", new Action(PostIsReady));
@@ -450,7 +450,7 @@ namespace PepperDash.Essentials.AppServer.Messengers
 				hasDirectorySearch = false,
 				hasRecents = true,
 				hasCameras = true,
-				selectedCamera = GetSelectedCamera(),
+				cameraSelected = GetSelectedCamera(),
 			});
 		}
 
@@ -523,7 +523,7 @@ namespace PepperDash.Essentials.AppServer.Messengers
 		{
 			PostStatusMessage(new
 			{
-				selectedCamera = GetSelectedCamera()
+				cameraSelected = GetSelectedCamera()
 			});
 		}
 
