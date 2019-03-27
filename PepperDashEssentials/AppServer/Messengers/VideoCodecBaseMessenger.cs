@@ -221,11 +221,11 @@ namespace PepperDash.Essentials.AppServer.Messengers
                     // Map preset actions
                 }
 
-                var speakerTrackCodec = Codec as IHasCameraSpeakerTrack;
+                var speakerTrackCodec = Codec as IHasCameraAutoMode;
                 if (speakerTrackCodec != null)
                 {
-                    appServerController.AddAction(MessagePath + "/cameraAuto", new Action(speakerTrackCodec.SpeakerTrackOn));
-                    appServerController.AddAction(MessagePath + "/cameraManual", new Action(speakerTrackCodec.SpeakerTrackOff));
+                    appServerController.AddAction(MessagePath + "/cameraAuto", new Action(speakerTrackCodec.CameraAutoModeOn));
+                    appServerController.AddAction(MessagePath + "/cameraManual", new Action(speakerTrackCodec.CameraAutoModeOff));
                 }
             }
 
@@ -308,10 +308,10 @@ namespace PepperDash.Essentials.AppServer.Messengers
         {
             string m = "";
 
-            var speakerTrackCodec = Codec as IHasCameraSpeakerTrack;
+            var speakerTrackCodec = Codec as IHasCameraAutoMode;
             if (speakerTrackCodec != null)
             {
-                if (speakerTrackCodec.SpeakerTrackIsOnFeedback.BoolValue) m = "auto";
+                if (speakerTrackCodec.CameraAutoModeIsOnFeedback.BoolValue) m = "auto";
                 else  m = "manual";
             }
             return m;
