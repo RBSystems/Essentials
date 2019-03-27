@@ -433,25 +433,31 @@ namespace PepperDash.Essentials.AppServer.Messengers
 		/// </summary>
 		void PostFullStatus()
 		{
-			this.PostStatusMessage(new
-			{
-				calls = GetCurrentCallList(),
-				cameraMode = GetCameraMode(),
-				currentCallString = EISC.GetString(SCurrentCallNumber),
-				currentDialString = EISC.GetString(SCurrentDialString),
-				directoryContactSelected = new
-				{
-					name = EISC.GetString(SDirectoryEntrySelectedName),
-					number = EISC.GetString(SDirectoryEntrySelectedNumber)
-				},
-				directorySelectedFolderName = EISC.GetString(SDirectorySelectedFolderName),
-				isInCall = EISC.GetString(SHookState) == "Connected",
-				hasDirectory = true,
-				hasDirectorySearch = false,
-				hasRecents = true,
-				hasCameras = true,
-				cameraSelected = GetSelectedCamera(),
-			});
+            this.PostStatusMessage(new
+            {
+                calls = GetCurrentCallList(),
+                currentCallString = EISC.GetString(SCurrentCallNumber),
+                currentDialString = EISC.GetString(SCurrentDialString),
+                directoryContactSelected = new
+                {
+                    name = EISC.GetString(SDirectoryEntrySelectedName),
+                    number = EISC.GetString(SDirectoryEntrySelectedNumber)
+                },
+                directorySelectedFolderName = EISC.GetString(SDirectorySelectedFolderName),
+                isInCall = EISC.GetString(SHookState) == "Connected",
+                hasDirectory = true,
+                hasDirectorySearch = false,
+                hasRecents = true,
+                hasCameras = true,
+                cameras = new
+                {
+                    cameraManualSupported = true,
+                    cameraAutoSupported = true,
+                    cameraOffSupported = true,
+                    cameraMode = GetCameraMode(),
+                    cameraSelected = GetSelectedCamera()
+                }
+            });
 		}
 
 		/// <summary>
@@ -500,10 +506,13 @@ namespace PepperDash.Essentials.AppServer.Messengers
 		/// </summary>
 		void PostCameraMode()
 		{
-			PostStatusMessage(new
-			{
-				cameraMode = GetCameraMode()
-			});
+            PostStatusMessage(new
+            {
+                cameras = new
+                {
+                    cameraMode = GetCameraMode()
+                }
+            });
 		}
 
 		/// <summary>
@@ -521,10 +530,13 @@ namespace PepperDash.Essentials.AppServer.Messengers
 
 		void PostSelectedCamera()
 		{
-			PostStatusMessage(new
-			{
-				cameraSelected = GetSelectedCamera()
-			});
+            PostStatusMessage(new
+            {
+                cameras = new
+                {
+                    cameraSelected = GetSelectedCamera()
+                }
+            });
 		}
 
 		/// <summary>

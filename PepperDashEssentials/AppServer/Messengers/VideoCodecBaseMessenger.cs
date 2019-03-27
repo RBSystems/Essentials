@@ -449,6 +449,23 @@ namespace PepperDash.Essentials.AppServer.Messengers
 				return;
 			}
 
+            object cameraInfo = null;
+
+            var camerasCodec = Codec as IHasCameras;
+            if (camerasCodec != null)
+            {
+                cameraInfo = new
+                {
+                    cameraManualSupported = true, // TODO: Determine dynamically if any cameras support PTZ control
+                    cameraAutoSupported = Codec as IHasCameraAutoMode,
+                    cameraOffSupported = Codec as IHasCameraOff,
+                    cameraSelected = camerasCodec.SelectedCameraFeedback.StringValue,
+                    cameraSelectedCapabilites = "ptz",  // For now, assume full control of camera (ignore focus)
+                    cameras = camerasCodec.Cameras
+                };
+            }
+
+
 			var info = Codec.CodecInfo;
 			PostStatusMessage(new
 			{
@@ -472,7 +489,7 @@ namespace PepperDash.Essentials.AppServer.Messengers
                 hasDirectorySearch = true,
                 hasRecents = Codec is IHasCallHistory,
                 hasCameras = Codec is IHasCameras,
-                cameraMode = "",
+                cameras = cameraInfo,
                 cameraSelected = (Codec as IHasCameras).SelectedCameraFeedback.StringValue
 			});
 		}
@@ -484,7 +501,10 @@ namespace PepperDash.Essentials.AppServer.Messengers
         {
             PostStatusMessage(new
             {
-                cameraMode = GetCameraMode()
+                cameras = new
+                {
+                    cameraMode = GetCameraMode()
+                }
             });
         }
 
@@ -492,7 +512,10 @@ namespace PepperDash.Essentials.AppServer.Messengers
         {
             PostStatusMessage(new
             {
-                cameraSelected = (Codec as IHasCameras).SelectedCameraFeedback.StringValue
+                cameras = new
+                {
+                    cameraSelected = (Codec as IHasCameras).SelectedCameraFeedback.StringValue
+                }
             });
         }
 	}

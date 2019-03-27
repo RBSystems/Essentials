@@ -35,3 +35,7 @@ devjson:3 {"deviceKey":"room1.RoomOccupancy.RoomIsOccupiedFeedback","methodName"
 devjson:2 {"deviceKey":"codec-comms-ssh", "methodName":"SendText", "params": ["xcommand dial number: 10.11.50.211\r"]}
 
 devjson:2 {"deviceKey":"codec-comms-ssh", "methodName":"Connect", "params": []}
+
+devjson:10 {"deviceKey":"ciscoSparkCodec-1", "methodName":"SendText", "params": ["xStatus Cameras Camera 1 Capabilities Options"]}
+
+devjson:10 {"deviceKey":"ciscoSparkCodec-1", "methodName":"SendText", "params": ["xStatus Cameras Camera 1 Position Zoom"]}
