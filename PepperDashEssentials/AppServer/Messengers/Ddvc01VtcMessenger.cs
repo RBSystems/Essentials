@@ -357,13 +357,11 @@ namespace PepperDash.Essentials.AppServer.Messengers
 			addAction("/cameraModeManual", BCameraModeManual);
 			addAction("/cameraModeOff", BCameraModeOff);
 
-			asc.AddAction(MessagePath + "/cameraSelect", new Action<string>(SelectCamera));
+			asc.AddAction(MessagePath + "/cameraSelect", new Action<string>(s => SelectCamera(s)));
 
-			// camera presets
-			for(uint i = 0; i < 6; i++) 
-			{
-				addAction(MessagePath + "/cameraPreset" + (i + 1), BCameraPresetStart + i);
-			}
+
+		    asc.AddAction(MessagePath + "/cameraPreset", new Action<uint>(i => SelectCameraPreset(i)));
+			
 
 			asc.AddAction(MessagePath + "/isReady", new Action(PostIsReady));
 			// Get status
@@ -595,6 +593,16 @@ namespace PepperDash.Essentials.AppServer.Messengers
 				EISC.SetUshort(UCameraNumberSelect, UInt16.Parse(cam));
 			}
 		}
+
+        /// <summary>
+        /// Pulses the join to select a preset
+        /// </summary>
+        /// <param name="preset"></param>
+        void SelectCameraPreset(uint preset)
+        {
+
+            EISC.PulseBool(BCameraPresetStart + preset, 200);
+        }
 
 		/// <summary>
 		/// Turns the 

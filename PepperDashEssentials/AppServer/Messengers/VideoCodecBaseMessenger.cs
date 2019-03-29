@@ -218,7 +218,7 @@ namespace PepperDash.Essentials.AppServer.Messengers
                 var presetsCodec = Codec as IHasCameraPresets;
                 if (presetsCodec != null)
                 {
-                    // Map preset actions
+                    appServerController.AddAction(MessagePath + "/cameraPreset", new Action<uint>(i => presetsCodec.CameraPresetSelect(i)));
                 }
 
                 var speakerTrackCodec = Codec as IHasCameraAutoMode;
@@ -299,8 +299,6 @@ namespace PepperDash.Essentials.AppServer.Messengers
                         AppServerController.AddAction(MessagePath + "/cameraFocusFar", new PressAndHoldAction(new Action<bool>(b => { if (b)focusCamera.FocusFar(); else focusCamera.FocusStop(); })));
                     }
                 }
-
-
             }
         }
 
@@ -457,14 +455,13 @@ namespace PepperDash.Essentials.AppServer.Messengers
                 cameraInfo = new
                 {
                     cameraManualSupported = true, // TODO: Determine dynamically if any cameras support PTZ control
-                    cameraAutoSupported = Codec as IHasCameraAutoMode,
-                    cameraOffSupported = Codec as IHasCameraOff,
+                    cameraAutoSupported = Codec is IHasCameraAutoMode,
+                    cameraOffSupported = Codec is IHasCameraOff,
                     cameraSelected = camerasCodec.SelectedCameraFeedback.StringValue,
                     cameraSelectedCapabilites = "ptz",  // For now, assume full control of camera (ignore focus)
-                    cameras = camerasCodec.Cameras
+                    cameraList = camerasCodec.Cameras
                 };
             }
-
 
 			var info = Codec.CodecInfo;
 			PostStatusMessage(new
@@ -489,8 +486,7 @@ namespace PepperDash.Essentials.AppServer.Messengers
                 hasDirectorySearch = true,
                 hasRecents = Codec is IHasCallHistory,
                 hasCameras = Codec is IHasCameras,
-                cameras = cameraInfo,
-                cameraSelected = (Codec as IHasCameras).SelectedCameraFeedback.StringValue
+                cameras = cameraInfo
 			});
 		}
 
