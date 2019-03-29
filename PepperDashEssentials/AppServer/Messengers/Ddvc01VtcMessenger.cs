@@ -9,6 +9,7 @@ using Crestron.SimplSharpPro.EthernetCommunication;
 using PepperDash.Core;
 using PepperDash.Essentials.Core;
 using PepperDash.Essentials.Devices.Common.Codec;
+using PepperDash.Essentials.Devices.Common.Cameras;
 
 namespace PepperDash.Essentials.AppServer.Messengers
 {
@@ -453,7 +454,18 @@ namespace PepperDash.Essentials.AppServer.Messengers
                     cameraAutoSupported = true,
                     cameraOffSupported = true,
                     cameraMode = GetCameraMode(),
-                    cameraSelected = GetSelectedCamera()
+                    selectedCamera = new
+                    {
+                        key = GetSelectedCamera(),
+                        isFarEnd = (GetSelectedCamera().Equals("cameraFar") ? true : false),
+                        capabilites = new
+                        {
+                            canPan = true,
+                            canTilt = true,
+                            canZoom = true,
+                            canFocus = true
+                        }
+                    }
                 }
             });
 		}
@@ -520,9 +532,9 @@ namespace PepperDash.Essentials.AppServer.Messengers
 		string GetCameraMode()
 		{
 			string m;
-			if (EISC.GetBool(BCameraModeAuto)) m = "auto";
-			else if (EISC.GetBool(BCameraModeManual)) m = "manual";
-			else m = "off";
+			if (EISC.GetBool(BCameraModeAuto)) m = eCameraControlMode.Auto.ToString();
+			else if (EISC.GetBool(BCameraModeManual)) m = eCameraControlMode.Manual.ToString();
+			else m = eCameraControlMode.Off.ToString();
 			return m;
 		}
 
@@ -532,7 +544,18 @@ namespace PepperDash.Essentials.AppServer.Messengers
             {
                 cameras = new
                 {
-                    cameraSelected = GetSelectedCamera()
+                    selectedCamera = new
+                    {
+                        key = GetSelectedCamera(),
+                        isFarEnd = (GetSelectedCamera().Equals("cameraFar") ? true : false),
+                        capabilites = new
+                        {
+                            canPan = true,
+                            canTilt = true,
+                            canZoom = true,
+                            canFocus = true
+                        }
+                    }
                 }
             });
 		}
@@ -584,7 +607,7 @@ namespace PepperDash.Essentials.AppServer.Messengers
 		void SelectCamera(string s)
 		{
 			var cam = s.Substring(6);
-			if (cam.ToLower() == "far")
+			if (cam.ToLower() == "cameraFar")
 			{
 				EISC.SetUshort(UCameraNumberSelect, 100);
 			}

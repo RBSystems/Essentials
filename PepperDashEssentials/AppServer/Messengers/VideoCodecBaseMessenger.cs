@@ -218,12 +218,15 @@ namespace PepperDash.Essentials.AppServer.Messengers
                 var presetsCodec = Codec as IHasCameraPresets;
                 if (presetsCodec != null)
                 {
-                    appServerController.AddAction(MessagePath + "/cameraPreset", new Action<uint>(i => presetsCodec.CameraPresetSelect(i)));
+#warning Check why this isn't working
+                    appServerController.AddAction(MessagePath + "/cameraPreset", new Action<ushort>(u => presetsCodec.CameraPresetSelect(u)));
                 }
 
                 var speakerTrackCodec = Codec as IHasCameraAutoMode;
                 if (speakerTrackCodec != null)
                 {
+                    speakerTrackCodec.CameraAutoModeIsOnFeedback.OutputChange += new EventHandler<PepperDash.Essentials.Core.FeedbackEventArgs>(CameraAutoModeIsOnFeedback_OutputChange);
+
                     appServerController.AddAction(MessagePath + "/cameraAuto", new Action(speakerTrackCodec.CameraAutoModeOn));
                     appServerController.AddAction(MessagePath + "/cameraManual", new Action(speakerTrackCodec.CameraAutoModeOff));
                 }
@@ -248,6 +251,11 @@ namespace PepperDash.Essentials.AppServer.Messengers
 			appServerController.AddAction(MessagePath + "/standbyOn", new Action(Codec.StandbyActivate));
 			appServerController.AddAction(MessagePath + "/standbyOff", new Action(Codec.StandbyDeactivate));
 		}
+
+        void CameraAutoModeIsOnFeedback_OutputChange(object sender, PepperDash.Essentials.Core.FeedbackEventArgs e)
+        {
+            PostCameraMode();
+        }
 
         void SelectedCameraFeedback_OutputChange(object sender, PepperDash.Essentials.Core.FeedbackEventArgs e)
         {
@@ -309,9 +317,17 @@ namespace PepperDash.Essentials.AppServer.Messengers
             var speakerTrackCodec = Codec as IHasCameraAutoMode;
             if (speakerTrackCodec != null)
             {
-                if (speakerTrackCodec.CameraAutoModeIsOnFeedback.BoolValue) m = "auto";
-                else  m = "manual";
+                if (speakerTrackCodec.CameraAutoModeIsOnFeedback.BoolValue) m = eCameraControlMode.Auto.ToString();
+                else m = eCameraControlMode.Manual.ToString();
             }
+
+            var cameraOffCodec = Codec as IHasCameraOff;
+            if (cameraOffCodec != null)
+            {
+                if (cameraOffCodec.CameraIsOffFeedback.BoolValue)
+                    m = eCameraControlMode.Off.ToString();
+            }
+
             return m;
         }
 
@@ -449,7 +465,7 @@ namespace PepperDash.Essentials.AppServer.Messengers
 
             object cameraInfo = null;
 
-            var camerasCodec = Codec as IHasCameras;
+            var camerasCodec = Codec as IHasCodecCameras;
             if (camerasCodec != null)
             {
                 cameraInfo = new
@@ -457,9 +473,20 @@ namespace PepperDash.Essentials.AppServer.Messengers
                     cameraManualSupported = true, // TODO: Determine dynamically if any cameras support PTZ control
                     cameraAutoSupported = Codec is IHasCameraAutoMode,
                     cameraOffSupported = Codec is IHasCameraOff,
-                    cameraSelected = camerasCodec.SelectedCameraFeedback.StringValue,
-                    cameraSelectedCapabilites = "ptz",  // For now, assume full control of camera (ignore focus)
-                    cameraList = camerasCodec.Cameras
+                    cameraMode = GetCameraMode(),
+                    cameraList = camerasCodec.Cameras,
+                    selectedCamera = new
+                    {
+                        key = camerasCodec.SelectedCameraFeedback.StringValue,
+                        isFarEnd = camerasCodec.ControllingFarEndCameraFeedback.BoolValue,
+                        capabilites = new
+                        {
+                            canPan = camerasCodec.SelectedCamera.CanPan,
+                            canTilt = camerasCodec.SelectedCamera.CanTilt,
+                            canZoom = camerasCodec.SelectedCamera.CanZoom,
+                            canFocus = camerasCodec.SelectedCamera.CanFocus
+                        }
+                    }
                 };
             }
 
@@ -506,11 +533,24 @@ namespace PepperDash.Essentials.AppServer.Messengers
 
         void PostSelectedCamera()
         {
+            var camerasCodec = Codec as IHasCodecCameras;
+
             PostStatusMessage(new
             {
                 cameras = new
                 {
-                    cameraSelected = (Codec as IHasCameras).SelectedCameraFeedback.StringValue
+                    selectedCamera = new
+                    {
+                        key = camerasCodec.SelectedCameraFeedback.StringValue,
+                        isFarEnd = camerasCodec.ControllingFarEndCameraFeedback.BoolValue,
+                        capabilites = new
+                        {
+                            canPan = camerasCodec.SelectedCamera.CanPan,
+                            canTilt = camerasCodec.SelectedCamera.CanTilt,
+                            canZoom = camerasCodec.SelectedCamera.CanZoom,
+                            canFocus = camerasCodec.SelectedCamera.CanFocus
+                        }
+                    }
                 }
             });
         }
