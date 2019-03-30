@@ -293,6 +293,7 @@ namespace PepperDash.Essentials.AppServer.Messengers
                     AppServerController.AddAction(MessagePath + "/cameraRight", new PressAndHoldAction(new Action<bool>(b => { if (b)camera.PanRight(); else camera.PanStop(); })));
                     AppServerController.AddAction(MessagePath + "/cameraZoomIn", new PressAndHoldAction(new Action<bool>(b => { if (b)camera.ZoomIn(); else camera.ZoomStop(); })));
                     AppServerController.AddAction(MessagePath + "/cameraZoomOut", new PressAndHoldAction(new Action<bool>(b => { if (b)camera.ZoomOut(); else camera.ZoomStop(); })));
+                    AppServerController.AddAction(MessagePath + "/cameraHome", new Action(camera.PositionHome));
 
                     var focusCamera = cameraCodec as IHasCameraFocusControl;
 
