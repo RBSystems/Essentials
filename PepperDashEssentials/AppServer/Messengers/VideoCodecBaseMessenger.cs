@@ -215,11 +215,13 @@ namespace PepperDash.Essentials.AppServer.Messengers
 
                 MapCameraActions();
 
-                var presetsCodec = Codec as IHasCameraPresets;
+                var presetsCodec = Codec as IHasCodecRoomPresets;
                 if (presetsCodec != null)
                 {
-#warning Check why this isn't working
-                    appServerController.AddAction(MessagePath + "/cameraPreset", new Action<ushort>(u => presetsCodec.CameraPresetSelect(u)));
+                    presetsCodec.CodecRoomPresetsListHasChanged += new EventHandler<EventArgs>(presetsCodec_CameraPresetsListHasChanged);
+
+                    appServerController.AddAction(MessagePath + "/cameraPreset", new Action<int>(u => presetsCodec.CodecRoomPresetSelect(u)));
+                    appServerController.AddAction(MessagePath + "/cameraPresetStore", new Action<CodecRoomPreset>(p => presetsCodec.CodecRoomPresetStore(p.ID, p.Description)));
                 }
 
                 var speakerTrackCodec = Codec as IHasCameraAutoMode;
@@ -251,6 +253,11 @@ namespace PepperDash.Essentials.AppServer.Messengers
 			appServerController.AddAction(MessagePath + "/standbyOn", new Action(Codec.StandbyActivate));
 			appServerController.AddAction(MessagePath + "/standbyOff", new Action(Codec.StandbyDeactivate));
 		}
+
+        void presetsCodec_CameraPresetsListHasChanged(object sender, EventArgs e)
+        {
+            PostCameraPresets();
+        }
 
         void CameraAutoModeIsOnFeedback_OutputChange(object sender, PepperDash.Essentials.Core.FeedbackEventArgs e)
         {
@@ -491,6 +498,14 @@ namespace PepperDash.Essentials.AppServer.Messengers
                 };
             }
 
+            object presetsInfo = null;
+
+            var presetsCodec = Codec as IHasCodecRoomPresets;
+            if (presetsCodec != null)
+            {
+                presetsInfo = presetsCodec.CodecRoomPresets;
+            }
+
 			var info = Codec.CodecInfo;
 			PostStatusMessage(new
 			{
@@ -514,7 +529,8 @@ namespace PepperDash.Essentials.AppServer.Messengers
                 hasDirectorySearch = true,
                 hasRecents = Codec is IHasCallHistory,
                 hasCameras = Codec is IHasCameras,
-                cameras = cameraInfo
+                cameras = cameraInfo,
+                presets = presetsInfo
 			});
 		}
 
@@ -553,6 +569,16 @@ namespace PepperDash.Essentials.AppServer.Messengers
                         }
                     }
                 }
+            });
+        }
+
+        void PostCameraPresets()
+        {
+            var presetsCodec = Codec as IHasCodecRoomPresets;
+
+            PostStatusMessage(new
+            {
+                presets = presetsCodec.CodecRoomPresets
             });
         }
 	}

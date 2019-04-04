@@ -778,6 +778,10 @@ namespace PepperDash.Essentials
 						{
 							(action as Action<ushort>)(messageObj["content"]["value"].Value<ushort>());
 						}
+                        else if (action is Action<int>)
+                        {
+                            (action as Action<int>)(messageObj["content"]["value"].Value<int>());
+                        }
 						else if (action is Action<string>)
 						{
 							(action as Action<string>)(messageObj["content"]["value"].Value<string>());
@@ -787,6 +791,12 @@ namespace PepperDash.Essentials
 							(action as Action<SourceSelectMessageContent>)(messageObj["content"]
 								.ToObject<SourceSelectMessageContent>());
 						}
+                        else if (action is Action<Essentials.Devices.Common.VideoCodec.CodecRoomPreset>)
+                        {
+                            (action as Action<Essentials.Devices.Common.VideoCodec.CodecRoomPreset>)(messageObj["content"]
+                                .ToObject<Essentials.Devices.Common.VideoCodec.CodecRoomPreset>());
+                        }
+
 					}
 					else
 					{
