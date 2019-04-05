@@ -10,6 +10,7 @@ using PepperDash.Core;
 using PepperDash.Essentials.Core;
 using PepperDash.Essentials.Devices.Common.Codec;
 using PepperDash.Essentials.Devices.Common.Cameras;
+using PepperDash.Essentials.Devices.Common.VideoCodec;
 
 namespace PepperDash.Essentials.AppServer.Messengers
 {
@@ -361,7 +362,8 @@ namespace PepperDash.Essentials.AppServer.Messengers
 			asc.AddAction(MessagePath + "/cameraSelect", new Action<string>(s => SelectCamera(s)));
 
 
-		    asc.AddAction(MessagePath + "/cameraPreset", new Action<uint>(i => SelectCameraPreset(i)));
+		    asc.AddAction(MessagePath + "/cameraPreset", new Action<ushort>(i => SelectCameraPreset(i)));
+            asc.AddAction(MessagePath + "/cameraPresetStore", new Action<CodecRoomPreset>(p => StoreCameraPreset(p))); // Needs implementatin in StoreCameraPreset()
 			
 
 			asc.AddAction(MessagePath + "/isReady", new Action(PostIsReady));
@@ -621,10 +623,14 @@ namespace PepperDash.Essentials.AppServer.Messengers
         /// Pulses the join to select a preset
         /// </summary>
         /// <param name="preset"></param>
-        void SelectCameraPreset(uint preset)
+        void SelectCameraPreset(ushort preset)
         {
-
             EISC.PulseBool(BCameraPresetStart + preset, 200);
+        }
+
+        void StoreCameraPreset(CodecRoomPreset preset)
+        {
+            // Figure out behaviour to store preset.  Possibly pulse the store join, and then the preset select join?
         }
 
 		/// <summary>
