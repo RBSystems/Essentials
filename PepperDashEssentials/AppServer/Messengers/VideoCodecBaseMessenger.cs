@@ -7,6 +7,8 @@ using Crestron.SimplSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+using PepperDash.Core;
+
 using PepperDash.Essentials.Devices.Common.Codec;
 using PepperDash.Essentials.Devices.Common.VideoCodec;
 using PepperDash.Essentials.Devices.Common.Cameras;
@@ -164,6 +166,8 @@ namespace PepperDash.Essentials.AppServer.Messengers
 		/// <param name="appServerController"></param>
 		protected override void CustomRegisterWithAppServer(CotijaSystemController appServerController)
 		{
+            Debug.Console(2, this, "Adding VideoCodecBase Actions");
+
 			appServerController.AddAction("/device/videoCodec/isReady", new Action(SendIsReady));
 			appServerController.AddAction("/device/videoCodec/fullStatus", new Action(SendVtcFullMessageObject));
 			appServerController.AddAction("/device/videoCodec/dial", new Action<string>(s => Codec.Dial(s)));
@@ -192,6 +196,7 @@ namespace PepperDash.Essentials.AppServer.Messengers
             var dirCodec = Codec as IHasDirectory;
             if (dirCodec != null)
             {
+                Debug.Console(2, this, "Adding IHasDirectory Actions");
                 appServerController.AddAction(MessagePath + "/getDirectory", new Action(GetDirectoryRoot));
                 appServerController.AddAction(MessagePath + "/directoryById", new Action<string>(s => GetDirectory(s)));
                 appServerController.AddAction(MessagePath + "/directorySearch", new Action<string>(s => DirectorySearch(s)));
@@ -202,12 +207,15 @@ namespace PepperDash.Essentials.AppServer.Messengers
             var recCodec = Codec as IHasCallHistory;
             if (recCodec != null)
             {
+                Debug.Console(2, this, "Adding IHasCallHistory Actions");
                 appServerController.AddAction(MessagePath + "/getCallHistory", new Action(GetCallHistory));
             }
 
             var cameraCodec = Codec as IHasCodecCameras;
             if (cameraCodec != null)
             {
+                Debug.Console(2, this, "Adding IHasCodecCameras Actions");
+
                 cameraCodec.CameraSelected += new EventHandler<CameraSelectedEventArgs>(cameraCodec_CameraSelected);
 
                 appServerController.AddAction(MessagePath + "/cameraSelect", new Action<string>(s => cameraCodec.SelectCamera(s)));
@@ -217,6 +225,8 @@ namespace PepperDash.Essentials.AppServer.Messengers
                 var presetsCodec = Codec as IHasCodecRoomPresets;
                 if (presetsCodec != null)
                 {
+                    Debug.Console(2, this, "Adding IHasCodecRoomPresets Actions");
+
                     presetsCodec.CodecRoomPresetsListHasChanged += new EventHandler<EventArgs>(presetsCodec_CameraPresetsListHasChanged);
 
                     appServerController.AddAction(MessagePath + "/cameraPreset", new Action<int>(u => presetsCodec.CodecRoomPresetSelect(u)));
@@ -226,6 +236,8 @@ namespace PepperDash.Essentials.AppServer.Messengers
                 var speakerTrackCodec = Codec as IHasCameraAutoMode;
                 if (speakerTrackCodec != null)
                 {
+                    Debug.Console(2, this, "Adding IHasCameraAutoMode Actions");
+
                     speakerTrackCodec.CameraAutoModeIsOnFeedback.OutputChange += new EventHandler<PepperDash.Essentials.Core.FeedbackEventArgs>(CameraAutoModeIsOnFeedback_OutputChange);
 
                     appServerController.AddAction(MessagePath + "/cameraAuto", new Action(speakerTrackCodec.CameraAutoModeOn));
@@ -235,14 +247,23 @@ namespace PepperDash.Essentials.AppServer.Messengers
 
             var selfViewCodec = Codec as IHasCodecSelfView;
 
-            if(selfViewCodec != null)
-                appServerController.AddAction(MessagePath + "/cameraSelfView", new Action(selfViewCodec.SelfViewModeToggle));
+            if (selfViewCodec != null)
+            {
+                Debug.Console(2, this, "Adding IHasCodecSelfView Actions");
 
+                appServerController.AddAction(MessagePath + "/cameraSelfView", new Action(selfViewCodec.SelfViewModeToggle));
+            }
 
             var layoutsCodec = Codec as IHasCodecLayouts;
-           
+
             if (layoutsCodec != null)
+            {
+                Debug.Console(2, this, "Adding IHasCodecLayouts Actions");
+
                 appServerController.AddAction(MessagePath + "/cameraRemoteView", new Action(layoutsCodec.LocalLayoutToggle));
+            }
+
+            Debug.Console(2, this, "Adding Privacy & Standby Actions");
 
 			appServerController.AddAction(MessagePath + "/privacyModeOn", new Action(Codec.PrivacyModeOn));
 			appServerController.AddAction(MessagePath + "/privacyModeOff", new Action(Codec.PrivacyModeOff));

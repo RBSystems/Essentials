@@ -107,8 +107,6 @@ namespace PepperDash.Essentials.Fusion
                     // Set the config on the device
                     (device as ReconfigurableDevice).SetConfig(deviceConfig);
                 }
-
-
             }
             catch (Exception e)
             {
