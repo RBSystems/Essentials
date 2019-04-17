@@ -205,12 +205,11 @@ namespace PepperDash.Essentials.AppServer.Messengers
                 appServerController.AddAction(MessagePath + "/getCallHistory", new Action(GetCallHistory));
             }
 
-            var cameraCodec = Codec as IHasCameras;
+            var cameraCodec = Codec as IHasCodecCameras;
             if (cameraCodec != null)
             {
                 cameraCodec.CameraSelected += new EventHandler<CameraSelectedEventArgs>(cameraCodec_CameraSelected);
 
-                cameraCodec.SelectedCameraFeedback.OutputChange +=new EventHandler<PepperDash.Essentials.Core.FeedbackEventArgs>(SelectedCameraFeedback_OutputChange);
                 appServerController.AddAction(MessagePath + "/cameraSelect", new Action<string>(s => cameraCodec.SelectCamera(s)));
 
                 MapCameraActions();
@@ -264,14 +263,11 @@ namespace PepperDash.Essentials.AppServer.Messengers
             PostCameraMode();
         }
 
-        void SelectedCameraFeedback_OutputChange(object sender, PepperDash.Essentials.Core.FeedbackEventArgs e)
-        {
-            PostSelectedCamera();
-        }
 
         void cameraCodec_CameraSelected(object sender, CameraSelectedEventArgs e)
         {
             MapCameraActions();
+            PostSelectedCamera();
         }
 
         /// <summary>
@@ -290,6 +286,7 @@ namespace PepperDash.Essentials.AppServer.Messengers
                 AppServerController.RemoveAction(MessagePath + "/cameraRight");
                 AppServerController.RemoveAction(MessagePath + "/cameraZoomIn");
                 AppServerController.RemoveAction(MessagePath + "/cameraZoomOut");
+                AppServerController.RemoveAction(MessagePath + "/cameraHome");
 
                 var camera = cameraCodec.SelectedCamera as IHasCameraPtzControl;
                 if (camera != null)
@@ -306,7 +303,7 @@ namespace PepperDash.Essentials.AppServer.Messengers
 
                     AppServerController.RemoveAction(MessagePath + "/cameraAutoFocus");
                     AppServerController.RemoveAction(MessagePath + "/cameraFocusNear");
-                    AppServerController.RemoveAction(MessagePath + "/CameraFocusFar");
+                    AppServerController.RemoveAction(MessagePath + "/cameraFocusFar");
 
                     if (focusCamera != null)
                     {
@@ -478,32 +475,13 @@ namespace PepperDash.Essentials.AppServer.Messengers
             {
                 cameraInfo = new
                 {
-                    cameraManualSupported = true, // TODO: Determine dynamically if any cameras support PTZ control
+                    cameraManualSupported = true, // For now, we assume manual mode is supported and selectively hide controls based on camera selection
                     cameraAutoSupported = Codec is IHasCameraAutoMode,
                     cameraOffSupported = Codec is IHasCameraOff,
                     cameraMode = GetCameraMode(),
                     cameraList = camerasCodec.Cameras,
-                    selectedCamera = new
-                    {
-                        key = camerasCodec.SelectedCameraFeedback.StringValue,
-                        isFarEnd = camerasCodec.ControllingFarEndCameraFeedback.BoolValue,
-                        capabilites = new
-                        {
-                            canPan = camerasCodec.SelectedCamera.CanPan,
-                            canTilt = camerasCodec.SelectedCamera.CanTilt,
-                            canZoom = camerasCodec.SelectedCamera.CanZoom,
-                            canFocus = camerasCodec.SelectedCamera.CanFocus
-                        }
-                    }
+                    selectedCamera = GetSelectedCamera(camerasCodec)
                 };
-            }
-
-            object presetsInfo = null;
-
-            var presetsCodec = Codec as IHasCodecRoomPresets;
-            if (presetsCodec != null)
-            {
-                presetsInfo = presetsCodec.CodecRoomPresets;
             }
 
 			var info = Codec.CodecInfo;
@@ -530,7 +508,7 @@ namespace PepperDash.Essentials.AppServer.Messengers
                 hasRecents = Codec is IHasCallHistory,
                 hasCameras = Codec is IHasCameras,
                 cameras = cameraInfo,
-                presets = presetsInfo
+                presets = GetCurrentPresets()
 			});
 		}
 
@@ -556,7 +534,24 @@ namespace PepperDash.Essentials.AppServer.Messengers
             {
                 cameras = new
                 {
-                    selectedCamera = new
+                    selectedCamera = GetSelectedCamera(camerasCodec)
+                },
+                presets = GetCurrentPresets()
+            });
+        }
+
+        void PostCameraPresets()
+        {
+
+            PostStatusMessage(new
+            {
+                presets = GetCurrentPresets()
+            });
+        }
+
+        object GetSelectedCamera(IHasCodecCameras camerasCodec)
+        {
+            return new
                     {
                         key = camerasCodec.SelectedCameraFeedback.StringValue,
                         isFarEnd = camerasCodec.ControllingFarEndCameraFeedback.BoolValue,
@@ -567,19 +562,21 @@ namespace PepperDash.Essentials.AppServer.Messengers
                             canZoom = camerasCodec.SelectedCamera.CanZoom,
                             canFocus = camerasCodec.SelectedCamera.CanFocus
                         }
-                    }
-                }
-            });
+                    };
         }
 
-        void PostCameraPresets()
+        List<CodecRoomPreset> GetCurrentPresets()
         {
             var presetsCodec = Codec as IHasCodecRoomPresets;
 
-            PostStatusMessage(new
-            {
-                presets = presetsCodec.CodecRoomPresets
-            });
+            List<CodecRoomPreset> currentPresets = null;
+
+            if (presetsCodec != null && Codec is IHasFarEndCameraControl && (Codec as IHasFarEndCameraControl).ControllingFarEndCameraFeedback.BoolValue)
+                currentPresets = presetsCodec.FarEndRoomPresets;
+            else
+                currentPresets = presetsCodec.NearEndPresets;
+
+            return currentPresets;
         }
 	}
 }
