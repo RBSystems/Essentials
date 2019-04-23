@@ -129,6 +129,15 @@ namespace PepperDash.Essentials
 		/// </summary>
 		public const uint VCSelfViewLayoutVisible = 1208;
         /// <summary>
+        /// 1209
+        /// </summary>
+        public const uint VCCameraAutoManualVisible = 1209;
+        /// <summary>
+        /// 1210
+        /// </summary>
+        public const uint VCCameraListVisible = 1210;
+
+        /// <summary>
         /// 1211 - 1215
         /// </summary>
         public const uint VCFavoritePressStart = 1211;
@@ -224,6 +233,47 @@ namespace PepperDash.Essentials
 		/// 1256
 		/// </summary>
 		public const uint VCMinMaxEnable = 1256;
+
+        // VC Camera Controls
+        /// <summary>
+        /// 1261
+        /// </summary>
+        public const uint VCCameraAutoModeVisible = 1261;
+        /// <summary>
+        /// 1262
+        /// </summary>
+        public const uint VCCameraAutoModePress = 1262;
+        /// <summary>
+        /// 1263
+        /// </summary>
+        public const uint VCCameraManualModeVisible = 1263;
+        /// <summary>
+        /// 1264
+        /// </summary>
+        public const uint VCCameraManualModePress = 1264;
+        /// <summary>
+        /// 1265
+        /// </summary>
+        public const uint VCCameraOffModeVisible = 1265;
+        /// <summary>
+        /// 1266
+        /// </summary>
+        public const uint VCCameraOffModePress = 1266;
+
+        /// <summary>
+        /// 1271
+        /// </summary>
+        public const uint VCCameraZoomInPress = 1271;
+        /// <summary>
+        /// 1272
+        /// </summary>
+        public const uint VCCameraZoomOutPress = 1272;
+
+        /// <summary>
+        /// 1281 - 1290
+        /// </summary>
+        public const uint VCCameraPresetPressStart = 1281;
+
 
         // Letter joins start at 2921;
 

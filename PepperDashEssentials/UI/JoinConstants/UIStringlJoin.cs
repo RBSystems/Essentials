@@ -41,6 +41,15 @@ namespace PepperDash.Essentials
 		public const uint VCRecentListTimeTextStart = 1231;
         //									RANGE IN USE
         public const uint VCRecentListTimeTextEnd = 1260;
+
+        /// <summary>
+        /// 1281 - 1290 range of joins for presets list
+        /// </summary>
+        public const uint VCCameraPresetTextStart = 1281;
+        //                                  RANGE IN USE
+        public const uint VCCameraPresetTextEnd = 1290;
+
+
 		/// <summary>
 		/// 1291 - the current layout mode
 		/// </summary>

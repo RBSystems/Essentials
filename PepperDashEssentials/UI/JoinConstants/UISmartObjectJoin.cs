@@ -32,6 +32,16 @@
 		/// 1205 Layout buttons dynamic list
 		/// </summary>
 		public const uint VCLayoutsList = 1205;
+        /// <summary>
+        /// 1206 VC Camera DPad
+        /// </summary>
+        public const uint VCCameraDpad = 1206;
+        /// <summary>
+        /// 1207 VC Camera List
+        /// </summary>
+        public const uint VCCameraList = 1207;
+
+
 
 
         //******************************************************
