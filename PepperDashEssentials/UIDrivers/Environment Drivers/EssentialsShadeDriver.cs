@@ -12,7 +12,7 @@ using PepperDash.Essentials.Devices.Common.Environment.Somfy;
 
 namespace PepperDash.Essentials
 {
-    public class EssentialsShadeDriver : PanelDriverBase, IEnvironmentSubdriver
+    public class EssentialsShadeDriver : PanelDriverBase, IPanelSubdriver
     {
         EssentialsEnvironmentDriver Parent;
 

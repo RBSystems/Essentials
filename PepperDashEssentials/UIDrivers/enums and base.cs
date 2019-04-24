@@ -42,6 +42,11 @@ namespace PepperDash.Essentials
 		HomePageList
 	}
 
+    public interface IPanelSubdriver
+    {
+        uint SubpageVisibleJoin { get; }
+    }
+
 	/// <summary>
 	/// 
 	/// </summary>

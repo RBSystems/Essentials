@@ -14,7 +14,7 @@ namespace PepperDash.Essentials
     /// <summary>
     /// Supports a lighting device with up to 6 scenes
     /// </summary>
-    public class EssentialsLightingDriver : PanelDriverBase, IEnvironmentSubdriver
+    public class EssentialsLightingDriver : PanelDriverBase, IPanelSubdriver
     {
         EssentialsEnvironmentDriver Parent;
 
