@@ -11,6 +11,7 @@ using PepperDash.Essentials;
 using PepperDash.Essentials.Core;
 using PepperDash.Essentials.Core.SmartObjects;
 using PepperDash.Essentials.Core.Touchpanels.Keyboards;
+using PepperDash.Essentials.Devices.Common.Cameras;
 using PepperDash.Essentials.Devices.Common.Codec;
 using PepperDash.Essentials.Devices.Common.VideoCodec;
 
@@ -50,6 +51,8 @@ namespace PepperDash.Essentials.UIDrivers.VC
         /// For the staging button feedbacks
         /// </summary>
         JoinedSigInterlock StagingButtonsFeedbackInterlock;
+
+        EssentialsVideoCodecCameraUiDriver CameraSubDriver;
 
         SmartObjectNumeric DialKeypad;
 
@@ -104,7 +107,11 @@ namespace PepperDash.Essentials.UIDrivers.VC
                 ActiveCallsSRL = new SubpageReferenceList(triList, UISmartObjectJoin.CodecActiveCallsHeaderList, 5,5,5);
                 SetupRecentCallsList();
                 SetupFavorites();
-                SetupLayoutControls();
+
+                if (Codec is IHasCodecCameras)
+                    SetupCameraControls();
+                else
+                    SetupNoCameraControls();
 
                 codec.CallStatusChange += new EventHandler<CodecCallStatusItemChangeEventArgs>(Codec_CallStatusChange);
 
@@ -707,42 +714,77 @@ namespace PepperDash.Essentials.UIDrivers.VC
         }
 
 		/// <summary>
-		/// 
+		/// Sets up just the controls exposed if there is no camera control available
 		/// </summary>
-		void SetupLayoutControls()
+		void SetupNoCameraControls()
 		{
-			TriList.SetSigFalseAction(UIBoolJoin.VCStagingSelfViewLayoutPress, this.ShowSelfViewLayout);
-			var svc = Codec as IHasCodecSelfView;
-			if (svc != null)
-			{
-				TriList.SetSigFalseAction(UIBoolJoin.VCSelfViewTogglePress, svc.SelfViewModeToggle);
-				svc.SelfviewIsOnFeedback.LinkInputSig(TriList.BooleanInput[UIBoolJoin.VCSelfViewTogglePress]);
-			}
-			var lc = Codec as IHasCodecLayouts;
-			if (lc != null)
-			{
-                TriList.SetSigFalseAction(UIBoolJoin.VCLayoutTogglePress, lc.LocalLayoutToggleSingleProminent);
-				lc.LocalLayoutFeedback.LinkInputSig(TriList.StringInput[UIStringJoin.VCLayoutModeText]);
-				lc.LocalLayoutFeedback.OutputChange += (o,a) => 
-				{
-					TriList.BooleanInput[UIBoolJoin.VCLayoutTogglePress].BoolValue =
-						lc.LocalLayoutFeedback.StringValue == "Prominent";
-				};
+            // Set the button label
+            TriList.SetString(UIStringJoin.VCActivePopoverItem1Text, "Layout");
 
+            SetupSelfViewControls();
 
-				// attach to cisco special things to enable buttons
-				var cisco = Codec as PepperDash.Essentials.Devices.Common.VideoCodec.Cisco.CiscoSparkCodec;
-				if (cisco != null)
-				{
-					// Cisco has min/max buttons that need special sauce
-					cisco.SharingContentIsOnFeedback.OutputChange += CiscoSharingAndPresentation_OutputChanges;
-					//cisco.PresentationViewMaximizedFeedback.OutputChange += CiscoSharingAndPresentation_OutputChanges;
+            SetupLayoutControls();
 
-					TriList.SetSigFalseAction(UIBoolJoin.VCMinMaxPress, cisco.MinMaxLayoutToggle);
-				}
-				 
-			}
 		}
+
+        void SetupCameraControls()
+        {
+            // Set the button label
+            TriList.SetString(UIStringJoin.VCActivePopoverItem1Text, "Camera");
+
+            SetupSelfViewControls();
+
+            SetupLayoutControls();
+
+            TriList.SetSigFalseAction(UIBoolJoin.VCStagingCameraPress, this.ShowCameraControls);
+            
+        }
+
+        /// <summary>
+        /// Sets up the self view button controls
+        /// </summary>
+        void SetupSelfViewControls()
+        {
+            TriList.SetSigFalseAction(UIBoolJoin.VCStagingSelfViewLayoutPress, this.ShowSelfViewLayout);
+            var svc = Codec as IHasCodecSelfView;
+            if (svc != null)
+            {
+                TriList.SetSigFalseAction(UIBoolJoin.VCSelfViewTogglePress, svc.SelfViewModeToggle);
+                svc.SelfviewIsOnFeedback.LinkInputSig(TriList.BooleanInput[UIBoolJoin.VCSelfViewTogglePress]);
+            }
+        }
+
+        /// <summary>
+        /// Sets up the layout button controls
+        /// </summary>
+        void SetupLayoutControls()
+        {
+            var lc = Codec as IHasCodecLayouts;
+            if (lc != null)
+            {
+                TriList.SetSigFalseAction(UIBoolJoin.VCLayoutTogglePress, lc.LocalLayoutToggleSingleProminent);
+                lc.LocalLayoutFeedback.LinkInputSig(TriList.StringInput[UIStringJoin.VCLayoutModeText]);
+                lc.LocalLayoutFeedback.OutputChange += (o, a) =>
+                {
+                    TriList.BooleanInput[UIBoolJoin.VCLayoutTogglePress].BoolValue =
+                        lc.LocalLayoutFeedback.StringValue == "Prominent";
+                };
+
+
+                // attach to cisco special things to enable buttons
+                var cisco = Codec as PepperDash.Essentials.Devices.Common.VideoCodec.Cisco.CiscoSparkCodec;
+                if (cisco != null)
+                {
+                    // Cisco has min/max buttons that need special sauce
+                    cisco.SharingContentIsOnFeedback.OutputChange += CiscoSharingAndPresentation_OutputChanges;
+                    //cisco.PresentationViewMaximizedFeedback.OutputChange += CiscoSharingAndPresentation_OutputChanges;
+
+                    TriList.SetSigFalseAction(UIBoolJoin.VCMinMaxPress, cisco.MinMaxLayoutToggle);
+                }
+            }
+        }
+
+
 
 		/// <summary>
 		/// This should only be linked by cisco classes (spark initially)
@@ -864,8 +906,7 @@ namespace PepperDash.Essentials.UIDrivers.VC
         /// </summary>
         void ShowCameraControls()
         {
-            VCControlsInterlock.ShowInterlocked(UIBoolJoin.VCCameraVisible);
-            StagingButtonsFeedbackInterlock.ShowInterlocked(UIBoolJoin.VCStagingCameraPress);
+            CameraSubDriver.Show();
         }
 
 		/// <summary>

@@ -55,6 +55,11 @@ namespace PepperDash.Essentials
 		/// </summary>
 		public const uint VCLayoutModeText = 1291;
 
+        /// <summary>
+        /// 1292 - label for the first active popover item button
+        /// </summary>
+        public const uint VCActivePopoverItem1Text = 1292;
+
 		/// <summary>
 		/// 1301 - 1400
 		/// </summary>

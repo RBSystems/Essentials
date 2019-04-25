@@ -123,7 +123,7 @@ namespace PepperDash.Essentials
         /// <summary>
         /// 1207
         /// </summary>
-        public const uint VCCameraVisible = 1207;
+        public const uint VCCameraManualVisible = 1207;
 		/// <summary>
 		/// 1208
 		/// </summary>
@@ -131,7 +131,7 @@ namespace PepperDash.Essentials
         /// <summary>
         /// 1209
         /// </summary>
-        public const uint VCCameraAutoManualVisible = 1209;
+        public const uint VCCameraModeVisible = 1209;
         /// <summary>
         /// 1210
         /// </summary>
@@ -270,9 +270,14 @@ namespace PepperDash.Essentials
         public const uint VCCameraZoomOutPress = 1272;
 
         /// <summary>
-        /// 1281 - 1290
+        /// 1290
         /// </summary>
-        public const uint VCCameraPresetPressStart = 1281;
+        public const uint VCCameraPresetStoredVisible = 1290;
+
+        /// <summary>
+        /// 1291 - 1300
+        /// </summary>
+        public const uint VCCameraPresetPressStart = 1291;
 
 
         // Letter joins start at 2921;

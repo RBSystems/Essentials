@@ -40,6 +40,10 @@
         /// 1207 VC Camera List
         /// </summary>
         public const uint VCCameraList = 1207;
+        /// <summary>
+        /// 1208 VC Camera List
+        /// </summary>
+        public const uint VCCameraMode = 1208;
 
 
 
