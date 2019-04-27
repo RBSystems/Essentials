@@ -130,6 +130,8 @@ namespace PepperDash.Essentials.UIDrivers.VC
                 else
                     VCControlsInterlock.SetButDontShow(UIBoolJoin.VCKeypadVisible);
 
+                VCControlsInterlock.StatusChanged += new EventHandler<StatusChangedEventArgs>(VCControlsInterlock_StatusChanged);
+
                 StagingBarsInterlock = new JoinedSigInterlock(triList);
                 StagingBarsInterlock.SetButDontShow(UIBoolJoin.VCStagingInactivePopoverVisible);
 
@@ -189,6 +191,12 @@ namespace PepperDash.Essentials.UIDrivers.VC
             {
                 Debug.Console(1, "Exception in VideoCodecUiDriver Constructor: {0}", e);
             }
+        }
+
+        void VCControlsInterlock_StatusChanged(object sender, StatusChangedEventArgs e)
+        {
+            if (e.PreviousJoin == UIBoolJoin.VCCameraModeVisible)
+                CameraSubDriver.Hide();
         }
 
 
@@ -381,6 +389,9 @@ namespace PepperDash.Essentials.UIDrivers.VC
         /// </summary>
         public override void Hide()
         {
+            if(CameraSubDriver != null)
+                CameraSubDriver.Hide();
+
             VCControlsInterlock.Hide();
             StagingBarsInterlock.Hide();
             base.Hide();
@@ -720,6 +731,7 @@ namespace PepperDash.Essentials.UIDrivers.VC
 		{
             // Set the button label
             TriList.SetString(UIStringJoin.VCActivePopoverItem1Text, "Layout");
+            TriList.SetSigFalseAction(UIBoolJoin.VCStagingActiveItem1Press, this.ShowSelfViewLayout);
 
             SetupSelfViewControls();
 
@@ -729,15 +741,15 @@ namespace PepperDash.Essentials.UIDrivers.VC
 
         void SetupCameraControls()
         {
+            CameraSubDriver = new EssentialsVideoCodecCameraUiDriver(this, Codec, UIBoolJoin.VCCameraModeVisible);
+
             // Set the button label
             TriList.SetString(UIStringJoin.VCActivePopoverItem1Text, "Camera");
+            TriList.SetSigFalseAction(UIBoolJoin.VCStagingActiveItem1Press, this.ShowCameraControl);
 
             SetupSelfViewControls();
 
-            SetupLayoutControls();
-
-            TriList.SetSigFalseAction(UIBoolJoin.VCStagingCameraPress, this.ShowCameraControls);
-            
+            SetupLayoutControls();            
         }
 
         /// <summary>
@@ -745,7 +757,6 @@ namespace PepperDash.Essentials.UIDrivers.VC
         /// </summary>
         void SetupSelfViewControls()
         {
-            TriList.SetSigFalseAction(UIBoolJoin.VCStagingSelfViewLayoutPress, this.ShowSelfViewLayout);
             var svc = Codec as IHasCodecSelfView;
             if (svc != null)
             {
@@ -901,14 +912,6 @@ namespace PepperDash.Essentials.UIDrivers.VC
             Parent.Keyboard.KeyPress -= Keyboard_SearchKeyPress;
         }
 
-        /// <summary>
-        /// Shows the camera controls subpage
-        /// </summary>
-        void ShowCameraControls()
-        {
-            CameraSubDriver.Show();
-        }
-
 		/// <summary>
 		/// shows the directory subpage
 		/// </summary>
@@ -939,7 +942,7 @@ namespace PepperDash.Essentials.UIDrivers.VC
 		void ShowSelfViewLayout()
 		{
 			VCControlsInterlock.ShowInterlocked(UIBoolJoin.VCSelfViewLayoutVisible);
-			StagingButtonsFeedbackInterlock.ShowInterlocked(UIBoolJoin.VCStagingSelfViewLayoutPress);
+			StagingButtonsFeedbackInterlock.ShowInterlocked(UIBoolJoin.VCStagingActiveItem1Press);
 		}
 
 		/// <summary>
@@ -950,6 +953,13 @@ namespace PepperDash.Essentials.UIDrivers.VC
             //populate recents
             VCControlsInterlock.ShowInterlocked(UIBoolJoin.VCRecentsVisible);
             StagingButtonsFeedbackInterlock.ShowInterlocked(UIBoolJoin.VCStagingRecentsPress);
+        }
+
+        void ShowCameraControl()
+        {
+            CameraSubDriver.Show();
+            VCControlsInterlock.ShowInterlocked(UIBoolJoin.VCCameraModeVisible);
+            StagingButtonsFeedbackInterlock.ShowInterlocked(UIBoolJoin.VCStagingActiveItem1Press);
         }
 
         /// <summary>

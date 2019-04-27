@@ -132,10 +132,6 @@ namespace PepperDash.Essentials
         /// 1209
         /// </summary>
         public const uint VCCameraModeVisible = 1209;
-        /// <summary>
-        /// 1210
-        /// </summary>
-        public const uint VCCameraListVisible = 1210;
 
         /// <summary>
         /// 1211 - 1215
@@ -165,10 +161,9 @@ namespace PepperDash.Essentials
         /// 1234
         /// </summary>
         public const uint VCStagingConnectPress = 1234;
-        /// <summary>
         /// 1235
         /// </summary>
-        public const uint VCStagingCameraPress = 1235;
+        public const uint VCStagingActiveItem1Press = 1235;
         /// <summary>
         /// 1236
         /// </summary>
@@ -194,9 +189,7 @@ namespace PepperDash.Essentials
 		/// </summary>
 		public const uint VCDirectorySearchTextPress = 1241;
 		/// <summary>
-		/// 1242
-		/// </summary>
-		public const uint VCStagingSelfViewLayoutPress = 1242;
+
         /// <summary>
         /// 1243
         /// </summary>
@@ -243,10 +236,10 @@ namespace PepperDash.Essentials
         /// 1262
         /// </summary>
         public const uint VCCameraAutoModePress = 1262;
-        /// <summary>
-        /// 1263
-        /// </summary>
-        public const uint VCCameraManualModeVisible = 1263;
+        ///// <summary>
+        ///// 1263
+        ///// </summary>
+        //public const uint VCCameraManualModeVisible = 1263;
         /// <summary>
         /// 1264
         /// </summary>
@@ -270,14 +263,32 @@ namespace PepperDash.Essentials
         public const uint VCCameraZoomOutPress = 1272;
 
         /// <summary>
-        /// 1290
+        /// 1273
         /// </summary>
-        public const uint VCCameraPresetStoredVisible = 1290;
+        public const uint VCCameraFocusNearPress = 1273;
+        /// <summary>
+        /// 1274
+        /// </summary>
+        public const uint VCCameraFocusFarPress = 1274;
+        /// <summary>
+        /// 1275
+        /// </summary>
+        public const uint VCCameraToggleAutoFocusPress = 1275;
 
         /// <summary>
-        /// 1291 - 1300
+        /// 1280
         /// </summary>
-        public const uint VCCameraPresetPressStart = 1291;
+        public const uint VCCameraPresetStoredVisible = 1290;
+        /// <summary>
+        /// 1281
+        /// </summary>
+        public const uint VCCameraPresetPressStart = 1281;
+        /// <summary>
+        /// 1283
+        /// </summary>
+        public const uint VCCameraPresetPressEnd = 1283;
+
+
 
 
         // Letter joins start at 2921;

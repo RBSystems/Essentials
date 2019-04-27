@@ -45,9 +45,6 @@
         /// </summary>
         public const uint VCCameraMode = 1208;
 
-
-
-
         //******************************************************
         // General
 

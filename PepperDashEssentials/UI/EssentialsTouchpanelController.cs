@@ -92,18 +92,26 @@ namespace PepperDash.Essentials
             if (Panel.Register() != eDeviceRegistrationUnRegistrationResponse.Success)
                 Debug.Console(0, this, Debug.ErrorLogLevel.Notice, "WARNING: Registration failed. Continuing, but panel may not function: {0}", Panel.RegistrationFailureReason);
 
-            // Give up cleanly if SGD is not present.
+            // First look for SGD file in sgd directory
             var sgdName = Global.FilePathPrefix
-                + Global.DirectorySeparator + "sgd" + Global.DirectorySeparator + props.SgdFile;
+                 + "sgd" + Global.DirectorySeparator + props.SgdFile;
             if (!File.Exists(sgdName))
             {
-                Debug.Console(0, this, "ERROR: Smart object file '{0}' not present. Exiting TSW load", sgdName);
-                return;
+                // If not found, look for SGD file as embedded resource in application directory
+                sgdName = Crestron.SimplSharp.CrestronIO.Directory.GetApplicationRootDirectory() + Global.DirectorySeparator + props.SgdFile;
+
+                if (!File.Exists(sgdName))
+                {
+                    //Give up cleanly if SGD is not present in either location
+                    Debug.Console(0, this, "ERROR: Smart object file '{0}' not present. Exiting TSW load", sgdName);
+                    return;
+                }
             }
+
+            Debug.Console(0, this, Debug.ErrorLogLevel.Notice, "Using SGD file: {0}", sgdName);
 
             Panel.LoadSmartObjects(sgdName);
             Panel.SigChange += Tsw_SigChange;
-
 		}
 
 		public void LoadAndShowDriver(PanelDriverBase driver)
