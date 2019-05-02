@@ -175,9 +175,13 @@ namespace PepperDash.Essentials.UIDrivers.VC
 
                 triList.SetSigFalseAction(UIBoolJoin.VCDirectoryBackPress, GetDirectoryParentFolderContents);
 
-                DirectoryBackButtonVisibleFeedback = (codec as IHasDirectory).CurrentDirectoryResultIsNotDirectoryRoot;
-                DirectoryBackButtonVisibleFeedback
-                    .LinkInputSig(triList.BooleanInput[UIBoolJoin.VCDirectoryBackVisible]);
+                var directoryCodec = Codec as IHasDirectory;
+                if (directoryCodec != null)
+                {
+                    DirectoryBackButtonVisibleFeedback = (codec as IHasDirectory).CurrentDirectoryResultIsNotDirectoryRoot;
+                    DirectoryBackButtonVisibleFeedback
+                        .LinkInputSig(triList.BooleanInput[UIBoolJoin.VCDirectoryBackVisible]);
+                }
 
                 triList.SetSigFalseAction(UIBoolJoin.VCKeypadTextPress, RevealKeyboard);
 
