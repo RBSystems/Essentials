@@ -92,13 +92,13 @@ namespace PepperDash.Essentials
             if (Panel.Register() != eDeviceRegistrationUnRegistrationResponse.Success)
                 Debug.Console(0, this, Debug.ErrorLogLevel.Notice, "WARNING: Registration failed. Continuing, but panel may not function: {0}", Panel.RegistrationFailureReason);
 
-            // First look for SGD file in sgd directory
+            // First look for SGD file in User or NVRAM/ProgramX sgd directory
             var sgdName = Global.FilePathPrefix
                  + "sgd" + Global.DirectorySeparator + props.SgdFile;
             if (!File.Exists(sgdName))
             {
                 // If not found, look for SGD file as embedded resource in application directory
-                sgdName = Crestron.SimplSharp.CrestronIO.Directory.GetApplicationRootDirectory() + Global.DirectorySeparator + props.SgdFile;
+                sgdName = Crestron.SimplSharp.CrestronIO.Directory.GetApplicationDirectory() + Global.DirectorySeparator + "SGD" + Global.DirectorySeparator + props.SgdFile;
 
                 if (!File.Exists(sgdName))
                 {
