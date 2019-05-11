@@ -322,7 +322,7 @@ namespace PepperDash.Essentials
                 PopupInterlock.ShowInterlockedWithToggle(UIBoolJoin.HeaderActiveCallsListVisible);
             else
             {
-                if((CurrentRoom.ScheduleSource as VideoCodecBase).IsInCall)
+                if(CurrentRoom.VideoCodec.IsInCall)
                     PopupInterlock.ShowInterlockedWithToggle(UIBoolJoin.HeaderActiveCallsListVisible);
             }
         }
