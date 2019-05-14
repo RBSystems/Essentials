@@ -651,26 +651,36 @@ namespace PepperDash.Essentials.UIDrivers.VC
                     {
                         DirectoryList.SetItemMainText(i, r.Name);
 
-                        var dc = r as DirectoryContact;
 
-                        if (dc.ContactMethods.Count > 1)
+                        // Handle IInvitableContacts separately, first
+                        var ic = r as IInvitableContact;
+
+                        if (ic != null)
                         {
-                            // If more than one contact method, show contact method modal dialog
-                            DirectoryList.SetItemButtonAction(i, b =>
-                            {
-                                if (!b)
-                                {
-                                    // Refresh the contact methods list
-                                    RefreshContactMethodsModalList(dc);
-                                    Parent.PopupInterlock.ShowInterlockedWithToggle(UIBoolJoin.MeetingsOrContacMethodsListVisible);
-                                }
-                            });
-
+                            DirectoryList.SetItemButtonAction(i, b => { if (!b) Codec.Dial(ic); });
                         }
                         else
                         {
-                            // If only one contact method, just dial that method
-							DirectoryList.SetItemButtonAction(i, b => { if (!b) Codec.Dial(dc.ContactMethods[0].Number); });
+                            var dc = r as DirectoryContact;
+
+                            if (dc.ContactMethods.Count > 1)
+                            {
+                                // If more than one contact method, show contact method modal dialog
+                                DirectoryList.SetItemButtonAction(i, b =>
+                                {
+                                    if (!b)
+                                    {
+                                        // Refresh the contact methods list
+                                        RefreshContactMethodsModalList(dc);
+                                        Parent.PopupInterlock.ShowInterlockedWithToggle(UIBoolJoin.MeetingsOrContacMethodsListVisible);
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                // If only one contact method, just dial that method
+                                DirectoryList.SetItemButtonAction(i, b => { if (!b) Codec.Dial(dc.ContactMethods[0].Number); });
+                            }
                         }
                     }
                     else    // is DirectoryFolder
