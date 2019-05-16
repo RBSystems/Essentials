@@ -63,13 +63,29 @@ namespace PepperDash.Essentials.UIDrivers.VC
 
             CameraModeInterlock.SetButDontShow(UIBoolJoin.VCCameraManualVisible);
 
+            // If the codec is ready, then setup the cameras and presets, otherwise wait
+            var videoCodec = codec as VideoCodecBase;
+
+            if (videoCodec.IsReady)
+                Codec_IsReady();
+            else
+                videoCodec.IsReadyChange += (o, a) => Codec_IsReady();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Codec_IsReady()
+        {
             SetupCameraModes();
 
             SetupCamerasList();
 
             MapCameraControls();
 
-            if(Codec is IHasCodecRoomPresets)
+            if (Codec is IHasCodecRoomPresets)
                 SetupCameraPresets();
         }
 
@@ -153,17 +169,18 @@ namespace PepperDash.Essentials.UIDrivers.VC
                 i++;
                 var c = camera;
 
-                CameraListSRL.AddItem(new SubpageReferenceListItem(i, CameraListSRL));
+                if (i <= CameraListSRL.MaxDefinedItems) // Only maps cameras up to the max defined items
+                {
+                    CameraListSRL.AddItem(new SubpageReferenceListItem(i, CameraListSRL));
 
-                CameraListSRL.StringInputSig(i, 1).StringValue = c.Name;
-                CameraListSRL.GetBoolFeedbackSig(i, 1).SetSigFalseAction(() => Codec.SelectCamera(c.Key));
+                    CameraListSRL.StringInputSig(i, 1).StringValue = c.Name;
+                    CameraListSRL.GetBoolFeedbackSig(i, 1).SetSigFalseAction(() => Codec.SelectCamera(c.Key));
 
-                if (Codec.SelectedCamera.Key == c.Key)
-                    CameraListSRL.BoolInputSig(i, 1).BoolValue = true;
-                else
-                    CameraListSRL.BoolInputSig(i, 1).BoolValue = false;
-
-                
+                    if (Codec.SelectedCamera.Key == c.Key)
+                        CameraListSRL.BoolInputSig(i, 1).BoolValue = true;
+                    else
+                        CameraListSRL.BoolInputSig(i, 1).BoolValue = false;
+                }
             }
 
             CameraListSRL.Count = i;
@@ -207,8 +224,8 @@ namespace PepperDash.Essentials.UIDrivers.VC
                 {
                     CameraDPad.SigUp.SetBoolSigAction(new Action<bool>(b => { if (b)camera.TiltUp(); else camera.TiltStop(); }));
                     CameraDPad.SigDown.SetBoolSigAction(new Action<bool>(b => { if (b)camera.TiltDown(); else camera.TiltStop(); }));
-                    CameraDPad.SigLeft.SetBoolSigAction(new Action<bool>(b => { if (b)camera.PanLeft(); else camera.TiltStop(); }));
-                    CameraDPad.SigRight.SetBoolSigAction(new Action<bool>(b => { if (b)camera.PanRight(); else camera.TiltStop(); }));
+                    CameraDPad.SigLeft.SetBoolSigAction(new Action<bool>(b => { if (b)camera.PanLeft(); else camera.PanStop(); }));
+                    CameraDPad.SigRight.SetBoolSigAction(new Action<bool>(b => { if (b)camera.PanRight(); else camera.PanStop(); }));
                     CameraDPad.SigCenter.SetSigFalseAction(new Action(camera.PositionHome));
 
                     TriList.SetBoolSigAction(UIBoolJoin.VCCameraZoomInPress, new Action<bool>(b => { if (b)camera.ZoomIn(); else camera.ZoomStop(); }));
