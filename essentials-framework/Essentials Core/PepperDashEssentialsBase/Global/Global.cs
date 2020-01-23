@@ -1,9 +1,14 @@
 ﻿using Crestron.SimplSharp;
 using Crestron.SimplSharp.CrestronDataStore;
+using Crestron.SimplSharp.CrestronIO;
 using Crestron.SimplSharpPro;
 
-//using PepperDash.Essentials.Core.Http;
+using PepperDash.Core;
 using PepperDash.Essentials.License;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Schema;
 
 
 
@@ -62,6 +67,40 @@ namespace PepperDash.Essentials.Core
         public static void SetFilePathPrefix(string prefix)
         {
             FilePathPrefix = prefix;
+        }
+
+        /// <summary>
+        /// Attempts to validate the JSON against the specified schema
+        /// </summary>
+        /// <param name="json">JSON to be validated</param>
+        /// <param name="schemaFileName">File name of schema to validate against</param>
+        public static void ValidateSchema(string json, string schemaFileName)
+        {
+            Debug.Console(0, Debug.ErrorLogLevel.Notice, "Validating Config File against Schema...");
+            JObject config = JObject.Parse(json);
+
+            using (StreamReader fileStream = new StreamReader(schemaFileName))
+            {
+                JsonSchema schema = JsonSchema.Parse(fileStream.ReadToEnd());
+
+                if (config.IsValid(schema))
+                    Debug.Console(0, Debug.ErrorLogLevel.Notice, "Configuration successfully Validated Against Schema");
+                else
+                {
+                    Debug.Console(0, Debug.ErrorLogLevel.Warning, "Validation Errors Found in Configuration:");
+                    config.Validate(schema, Json_ValidationEventHandler);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Event Handler callback for JSON validation
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        public static void Json_ValidationEventHandler(object sender, ValidationEventArgs args)
+        {
+            Debug.Console(0, Debug.ErrorLogLevel.Error, "JSON Validation error at line {0} position {1}: {2}", args.Exception.LineNumber, args.Exception.LinePosition, args.Message);
         }
 
 		static Global()

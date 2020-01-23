@@ -102,7 +102,7 @@ namespace PepperDash.Essentials.Core.Config
                     if(File.Exists(schemaFilePath))
                     {
                         // Attempt to validate config against schema
-                        ValidateSchema(jsonConfig, schemaFilePath);
+                        Global.ValidateSchema(jsonConfig, schemaFilePath);
                     }
                     else
                         Debug.Console(0, Debug.ErrorLogLevel.Warning, "No Schema found at path: {0}", schemaFilePath);
@@ -145,39 +145,9 @@ namespace PepperDash.Essentials.Core.Config
 			}
 		}
 
-        /// <summary>
-        /// Attempts to validate the JSON against the specified schema
-        /// </summary>
-        /// <param name="json">JSON to be validated</param>
-        /// <param name="schemaFileName">File name of schema to validate against</param>
-        public static void ValidateSchema(string json, string schemaFileName)
-        {
-            Debug.Console(0, Debug.ErrorLogLevel.Notice, "Validating Config File against Schema...");
-            JObject config = JObject.Parse(json);
 
-            using (StreamReader fileStream = new StreamReader(schemaFileName))
-            {
-                JsonSchema schema = JsonSchema.Parse(fileStream.ReadToEnd());
 
-                if (config.IsValid(schema))
-                    Debug.Console(0, Debug.ErrorLogLevel.Notice, "Configuration successfully Validated Against Schema");
-                else
-                {
-                    Debug.Console(0, Debug.ErrorLogLevel.Warning, "Validation Errors Found in Configuration:");
-                    config.Validate(schema, Json_ValidationEventHandler);
-                }              
-            }
-        }
 
-        /// <summary>
-        /// Event Handler callback for JSON validation
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        public static void Json_ValidationEventHandler(object sender, ValidationEventArgs args)
-        {
-            Debug.Console(0, "JSON Validation error at line {0} position {1}: {2}", args.Exception.LineNumber, args.Exception.LinePosition, args.Message);
-        }
 
         /// <summary>
         /// Returns all the files from the directory specified.

@@ -39,6 +39,22 @@ namespace PepperDash.Essentials.Devices.Displays
 				}
                 else if(typeName == "samsungmdc")
                 {
+                    var directoryPrefix = string.Format("{0}Display{1}Schema{1}", Global.ApplicationDirectoryPrefix, Global.DirectorySeparator);
+
+                    var schemaFilePath = directoryPrefix + "SamsungMDCPropertiesConfigSchema.json";
+                    Debug.Console(0, Debug.ErrorLogLevel.Notice, "Loading Schema from path: {0}", schemaFilePath);
+
+                    var jsonConfig = dc.Properties.ToString();
+
+                    if (File.Exists(schemaFilePath))
+                    {
+                        // Attempt to validate config against schema
+                        Global.ValidateSchema(jsonConfig, schemaFilePath);
+                    }
+                    else
+                        Debug.Console(0, Debug.ErrorLogLevel.Warning, "No Schema found at path: {0}", schemaFilePath);
+
+
                     var comm = CommFactory.CreateCommForDevice(dc);
                     if (comm != null)
                         return new SamsungMDC(dc.Key, dc.Name, comm, dc.Properties["id"].Value<string>());
