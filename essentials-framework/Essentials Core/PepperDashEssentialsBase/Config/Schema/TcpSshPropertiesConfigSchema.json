@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$schema": "http://json-schema.org/draft-03/schema#",
     "type": "object",
     "title": "TcpSshPropertiesConfig",
     "$ref": "#/definitions/TcpSshPropertiesConfig",
@@ -16,6 +16,7 @@
                     "pattern": "^(.*)$"
                 },
                 "port": {
+                    "required":true,
                     "type": "integer",
                     "title": "Port Number",
                     "minimum": 1,
@@ -27,6 +28,7 @@
                     ]
                 },
                 "address": {
+                    "required":true,
                     "type": "string",
                     "title": "IP Address or Hostname",
                     "examples": [
@@ -71,11 +73,7 @@
                         32768
                     ]
                 }
-            },
-            "required": [
-                "port",
-                "address"
-            ]
+            }
         }
     }
 }

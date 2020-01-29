@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "http://json-schema.org/draft-03/schema#",
   "type": "object",
   "title": "Control Properties",
   "$ref": "#/definitions/ControlPropertiesConfig",
@@ -8,6 +8,7 @@
       "description": "The method of communicating with the device",
       "properties": {
         "method": {
+          "required":true,
           "type": "string",
           "title": "Communication Method",
           "enum": [
@@ -25,7 +26,7 @@
           ]
         },
         "tcpSshProperties": {
-          "$ref":"TcpSshPropertiesConfigSchema.json#definitions/TcpSshPropertiesConfig",
+          "$ref":"TcpSshPropertiesConfigSchema.json#/definitions/TcpSshPropertiesConfig",
           "title": "Properties for IP based communication",
           "default": null
         },
@@ -93,19 +94,20 @@
             "type":"string",
             "enum":[
               "None",
-              "RTS",
-              "CTS",
-              "RTSCTS"
+              "XON",
+              "XONT",
+              "XONR"
             ]
           },
           "hardwareHandshake":{
             "title":"Hardware Handshake",
             "type":"string",
+
             "enum":[
               "None",
-              "XON",
-              "XONT",
-              "XONR"
+              "RTS",
+              "CTS",
+              "RTSCTS"
             ]
           },
           "pacing":{
@@ -172,10 +174,7 @@
           ],
           "pattern": "^(?!00|01|02|FF)[0-9,A-F,a-f][0-9,A-F,a-f]$"
         }
-      },
-      "required": [
-        "method"
-      ]
+      }
     }
   }
 }

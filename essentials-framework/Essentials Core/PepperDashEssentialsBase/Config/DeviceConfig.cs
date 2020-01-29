@@ -11,7 +11,7 @@ using PepperDash.Essentials.Core;
 
 namespace PepperDash.Essentials.Core.Config
 {
-    public class DeviceConfig : PropertiesConfigBase
+    public class DeviceConfig
     {
         /// <summary>
         /// The unique idendifier for the device
